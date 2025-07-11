@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { IUser } from '../models/User';
 import {
   createPostService,
   getAllPostsService,
@@ -17,7 +18,8 @@ export const createPost = async (req: Request, res: Response) => {
     return res.status(401).json({ message: '로그인이 필요합니다.' });
   }
   try {
-    const author = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const author = user._id;
     const { content, image } = req.body as { content: string; image?: string };
     const post = await createPostService(author, content, image);
     res.status(201).json(post);
@@ -55,7 +57,8 @@ export const updatePost = async (req: Request, res: Response) => {
   }
   try {
     const postId = new mongoose.Types.ObjectId(req.params.id);
-    const author = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const author = user._id;
     const { content, image } = req.body as { content?: string; image?: string };
     const post = await updatePostService(postId, author, content, image);
     if (!post) return res.status(404).json({ message: '수정 권한이 없거나 게시물이 없습니다.' });
@@ -72,7 +75,8 @@ export const deletePost = async (req: Request, res: Response) => {
   }
   try {
     const postId = new mongoose.Types.ObjectId(req.params.id);
-    const author = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const author = user._id;
     const post = await deletePostService(postId, author);
     if (!post) return res.status(404).json({ message: '삭제 권한이 없거나 게시물이 없습니다.' });
     res.json({ success: true });
@@ -88,7 +92,8 @@ export const toggleLike = async (req: Request, res: Response) => {
   }
   try {
     const postId = new mongoose.Types.ObjectId(req.params.id);
-    const userId = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const userId = user._id;
     const result = await toggleLikeService(postId, userId);
     res.json(result);
   } catch (err) {
@@ -103,7 +108,8 @@ export const addComment = async (req: Request, res: Response) => {
   }
   try {
     const postId = new mongoose.Types.ObjectId(req.params.id);
-    const userId = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const userId = user._id;
     const { text } = req.body as { text: string };
     const post = await addCommentService(postId, userId, text);
     res.json(post);
@@ -119,7 +125,8 @@ export const deleteComment = async (req: Request, res: Response) => {
   }
   try {
     const postId = new mongoose.Types.ObjectId(req.params.id);
-    const userId = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const userId = user._id;
     const commentId = req.params.commentId;
     const post = await deleteCommentService(postId, userId, commentId);
     res.json(post);

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { getMyProfileService, updateMyProfileService, getUserProfileService } from '../services/userService';
+import { IUser } from '../models/User';
 
 // 내 프로필 조회
 export const getMyProfile = async (req: Request, res: Response) => {
@@ -8,9 +9,10 @@ export const getMyProfile = async (req: Request, res: Response) => {
     return res.status(401).json({ message: '로그인이 필요합니다.' });
   }
   try {
-    const userId = req.user._id as mongoose.Types.ObjectId;
-    const user = await getMyProfileService(userId);
-    res.json(user);
+    const user = req.user as IUser;
+    const userId = user._id;
+    const result = await getMyProfileService(userId);
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: '프로필 조회 실패', error: err });
   }
@@ -22,10 +24,11 @@ export const updateMyProfile = async (req: Request, res: Response) => {
     return res.status(401).json({ message: '로그인이 필요합니다.' });
   }
   try {
-    const userId = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const userId = user._id;
     const { nickname, bio, profileImage } = req.body as { nickname?: string; bio?: string; profileImage?: string };
-    const user = await updateMyProfileService(userId, nickname, bio, profileImage);
-    res.json(user);
+    const result = await updateMyProfileService(userId, nickname, bio, profileImage);
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: '프로필 수정 실패', error: err });
   }

@@ -78,9 +78,11 @@ export const deleteCommentService = async (
 ): Promise<IPost> => {
   const post = await Post.findById(postId);
   if (!post) throw new Error('게시물을 찾을 수 없습니다.');
-  const comment = post.comments.id(commentId);
+  
+  const comment = (post.comments as any).id(commentId);
   if (!comment) throw new Error('댓글을 찾을 수 없습니다.');
   if (!comment.user.equals(userId)) throw new Error('삭제 권한이 없습니다.');
+  
   comment.remove();
   await post.save();
   return post;

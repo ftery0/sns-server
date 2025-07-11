@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { IUser } from '../models/User';
 import { createChatService, getMyChatsService, getChatMessagesService, sendMessageService } from '../services/chatService';
 
 // 채팅방 생성 (1:1 또는 그룹)
@@ -8,7 +9,8 @@ export const createChat = async (req: Request, res: Response) => {
     return res.status(401).json({ message: '로그인이 필요합니다.' });
   }
   try {
-    const myId = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const myId = user._id;
     const { members, isGroup } = req.body as { members: string[]; isGroup: boolean };
     const memberIds = members.map(id => new mongoose.Types.ObjectId(id));
     const chat = await createChatService(myId, memberIds, isGroup);
@@ -24,7 +26,8 @@ export const getMyChats = async (req: Request, res: Response) => {
     return res.status(401).json({ message: '로그인이 필요합니다.' });
   }
   try {
-    const myId = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const myId = user._id;
     const chats = await getMyChatsService(myId);
     res.json(chats);
   } catch (err) {
@@ -53,7 +56,8 @@ export const sendMessage = async (req: Request, res: Response) => {
   }
   try {
     const chatId = new mongoose.Types.ObjectId(req.params.id);
-    const senderId = req.user._id as mongoose.Types.ObjectId;
+    const user = req.user as IUser;
+    const senderId = user._id;
     const { text } = req.body as { text: string };
     const message = await sendMessageService(chatId, senderId, text);
     res.json(message);

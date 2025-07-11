@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getBestPosts } from '../bestPost/bestController';
+import { getBestPosts } from '../controllers/bestController';
 
 const router = Router();
 
